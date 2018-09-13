@@ -1,17 +1,15 @@
 package com.my8421.tvwebbrowser;
 
-import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
@@ -28,6 +26,18 @@ import java.io.InputStreamReader;
 import static android.view.View.SCROLLBARS_OUTSIDE_OVERLAY;
 
 public class MainActivity extends AppCompatActivity {
+    BroadcastReceiver mMasterResetReciever = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            try {
+                Intent i = new Intent();
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.setClass(context, MainActivity.class);
+                context.startActivity(i);
+            } catch (Exception e) {
+                Log.i("Output:", e.toString());
+            }
+        }
+    };
     private WebView webView;
     private String url = "";
     private PowerManager.WakeLock mWakeLock = null;
@@ -38,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         //隐藏标题栏
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //全屏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //禁止休眠，
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -88,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (lineTxt!=null   && lineTxt != "") {
+                    if (lineTxt != null && lineTxt != "") {
                         url = lineTxt;
                     }
                 }
@@ -126,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
 
         registerReceiver(mMasterResetReciever, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
-        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE,"类名");
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "类名");
         mWakeLock.acquire();
     }
 
@@ -135,23 +145,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        if(mWakeLock != null){
+        if (mWakeLock != null) {
             mWakeLock.release();
             mWakeLock = null;
         }
     }
-
-    BroadcastReceiver mMasterResetReciever = new BroadcastReceiver(){
-        public void onReceive(Context context, Intent intent) {
-            try {
-                Intent i = new Intent();
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.setClass(context, MainActivity.class);
-                context.startActivity(i);
-            } catch (Exception e) {
-                Log.i("Output:", e.toString());
-            }
-        }
-    } ;
 
 }
